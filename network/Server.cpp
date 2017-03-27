@@ -4,6 +4,8 @@
  */
 
 #include <cstring>
+#include <unistd.h>
+#include <sys/socket.h>
 
 #include "Server.hpp"
 #include "ServerException.hpp"
@@ -18,10 +20,46 @@ Server::Server(const string port) {
 }
 
 /**
+ * Binds the socket for incoming connections.
+ */
+void Server::bindSocket() {
+    int status;
+    struct addrinfo *info;
+
+    for (info = serverInfo; NULL != info; info = info->ai_next) {
+        serverSocket = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
+
+        if (-1 == serverSocket) {
+            continue;
+        }
+
+        status = bind(serverSocket, info->ai_addr, info->ai_addrlen);
+        if (-1 == status) {
+            continue;
+        }
+
+        break;
+    }
+
+    if (NULL == info) {
+        if (-1 == serverSocket) {
+            throw ServerException("error: could not bind to port " + serverPort + ": " + strerror(errno),
+                                  ServerException::CODE_BIND_ERROR);
+        } else {
+            string message = "error: could not create socket: ";
+            message += strerror(errno);
+
+            throw ServerException(message, ServerException::CODE_SOCKET_ERROR);
+        }
+    }
+}
+
+/**
  * Initialize the server connectivity.
  */
 void Server::init() {
     setServerInfo();
+    bindSocket();
 }
 
 /**
@@ -50,4 +88,7 @@ void Server::setServerInfo() {
  */
 void Server::shutdown() {
     freeaddrinfo(serverInfo);
+    if (0 <= serverSocket) {
+        close(serverSocket);
+    }
 }

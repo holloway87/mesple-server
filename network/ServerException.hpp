@@ -14,6 +14,8 @@ using namespace std;
 class ServerException {
 public:
     const static short CODE_NO_ADDRESS_INFO = 10;
+    const static short CODE_SOCKET_ERROR = 11;
+    const static short CODE_BIND_ERROR = 12;
 
     short code;
     string message;

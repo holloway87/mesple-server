@@ -16,7 +16,9 @@ class Server {
 private:
     struct addrinfo *serverInfo;
     string serverPort;
+    int serverSocket;
 
+    void bindSocket();
     void setServerInfo();
 
 public:
