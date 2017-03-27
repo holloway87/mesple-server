@@ -44,3 +44,10 @@ void Server::setServerInfo() {
         throw ServerException(message, ServerException::CODE_NO_ADDRESS_INFO);
     }
 }
+
+/**
+ * Close connections and free resources.
+ */
+void Server::shutdown() {
+    freeaddrinfo(serverInfo);
+}

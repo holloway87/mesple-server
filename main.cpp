@@ -27,5 +27,7 @@ int main(int argc, char *argv[]) {
         return e.code;
     }
 
+    server.shutdown();
+
     return 0;
 }

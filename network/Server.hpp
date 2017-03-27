@@ -22,6 +22,7 @@ private:
 public:
     Server(const string port);
     void init();
+    void shutdown();
 };
 
 
