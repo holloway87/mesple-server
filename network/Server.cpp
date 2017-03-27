@@ -43,13 +43,13 @@ void Server::bindSocket() {
 
     if (NULL == info) {
         if (-1 == serverSocket) {
-            throw ServerException("error: could not bind to port " + serverPort + ": " + strerror(errno),
-                                  ServerException::CODE_BIND_ERROR);
-        } else {
             string message = "error: could not create socket: ";
             message += strerror(errno);
 
             throw ServerException(message, ServerException::CODE_SOCKET_ERROR);
+        } else {
+            throw ServerException("error: could not bind to port " + serverPort + ": " + strerror(errno),
+                                  ServerException::CODE_BIND_ERROR);
         }
     }
 }
