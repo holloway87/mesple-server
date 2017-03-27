@@ -3,6 +3,7 @@
  * @since 2017.03.27
  */
 
+#include <csignal>
 #include <cstring>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -11,11 +12,17 @@
 #include "ServerException.hpp"
 
 /**
+ * Determines if the server is running.
+ */
+bool Server::running;
+
+/**
  * New instance with the given server port.
  *
  * @param port
  */
 Server::Server(const string port) {
+    running = true;
     serverPort = port;
 }
 
@@ -58,9 +65,21 @@ void Server::bindSocket() {
  * Initialize the server connectivity.
  */
 void Server::init() {
+    signal(SIGKILL, Server::signalHandler);
+    signal(SIGINT, Server::signalHandler);
+    signal(SIGTERM, Server::signalHandler);
+
     setServerInfo();
     bindSocket();
     startListen();
+}
+
+/**
+ * Main loop for incoming connections.
+ */
+void Server::loop() {
+    while (running) {
+    }
 }
 
 /**
@@ -108,3 +127,15 @@ void Server::startListen() {
         throw ServerException(message, ServerException::CODE_LISTEN_ERROR);
     }
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+/**
+ * Stops the server via a signal.
+ *
+ * @param signal
+ */
+void Server::signalHandler(int signal) {
+    running = false;
+}
+#pragma clang diagnostic pop

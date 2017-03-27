@@ -17,6 +17,7 @@ private:
     struct addrinfo *serverInfo;
     string serverPort;
     int serverSocket;
+    static bool running;
 
     void bindSocket();
     void setServerInfo();
@@ -25,6 +26,8 @@ private:
 public:
     Server(const string port);
     void init();
+    void loop();
+    void static signalHandler(int signal);
     void shutdown();
 };
 
