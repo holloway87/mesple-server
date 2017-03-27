@@ -16,6 +16,7 @@ public:
     const static short CODE_NO_ADDRESS_INFO = 10;
     const static short CODE_SOCKET_ERROR = 11;
     const static short CODE_BIND_ERROR = 12;
+    const static short CODE_LISTEN_ERROR = 13;
 
     short code;
     string message;

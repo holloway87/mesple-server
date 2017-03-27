@@ -60,6 +60,7 @@ void Server::bindSocket() {
 void Server::init() {
     setServerInfo();
     bindSocket();
+    startListen();
 }
 
 /**
@@ -90,5 +91,20 @@ void Server::shutdown() {
     freeaddrinfo(serverInfo);
     if (0 <= serverSocket) {
         close(serverSocket);
+    }
+}
+
+/**
+ * Start to listen for connections.
+ */
+void Server::startListen() {
+    int status;
+
+    status = listen(serverSocket, 20);
+    if (-1 == status) {
+        string message = "error: could not start to listen on port";
+        message += strerror(errno);
+
+        throw ServerException(message, ServerException::CODE_LISTEN_ERROR);
     }
 }

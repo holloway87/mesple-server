@@ -20,6 +20,7 @@ private:
 
     void bindSocket();
     void setServerInfo();
+    void startListen();
 
 public:
     Server(const string port);
