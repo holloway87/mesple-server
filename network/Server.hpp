@@ -10,10 +10,13 @@
 #include <netdb.h>
 #include <string>
 
+#include "ConnectionManager.hpp"
+
 using namespace std;
 
 class Server {
 private:
+    ConnectionManager *connectionManager;
     struct addrinfo *serverInfo;
     string serverPort;
     int serverSocket;
@@ -28,7 +31,7 @@ public:
     void init();
     void loop();
     void static signalHandler(int signal);
-    void shutdown();
+    void shutdownServer();
 };
 
 

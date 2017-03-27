@@ -7,6 +7,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <thread>
 
 #include "Server.hpp"
 #include "ServerException.hpp"
@@ -78,8 +79,16 @@ void Server::init() {
  * Main loop for incoming connections.
  */
 void Server::loop() {
+    connectionManager = new ConnectionManager(serverSocket);
+    thread connectionThread(&ConnectionManager::loop, connectionManager);
+
     while (running) {
     }
+
+    connectionManager->running = false;
+    // shutdown server socket to abort the current accept call on the connection manager
+    shutdown(serverSocket, 2);
+    connectionThread.join();
 }
 
 /**
@@ -106,7 +115,7 @@ void Server::setServerInfo() {
 /**
  * Close connections and free resources.
  */
-void Server::shutdown() {
+void Server::shutdownServer() {
     freeaddrinfo(serverInfo);
     if (0 <= serverSocket) {
         close(serverSocket);
