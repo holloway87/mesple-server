@@ -3,10 +3,11 @@
  * @since 2017.03.27
  */
 
+#include <arpa/inet.h>
 #include <csignal>
 #include <cstring>
+#include <iostream>
 #include <unistd.h>
-#include <sys/socket.h>
 #include <thread>
 
 #include "Server.hpp"
@@ -25,6 +26,24 @@ bool Server::running;
 Server::Server(const string port) {
     running = true;
     serverPort = port;
+}
+
+/**
+ * Check for new clients and add them.
+ *
+ * @since 2017.03.29
+ */
+void Server::addNewClients() {
+    vector<Client> newClients = connectionManager->getNewClients();
+    if (newClients.empty()) {
+        return;
+    }
+
+    for (vector<Client>::iterator it = newClients.begin(); it != newClients.end(); ++it) {
+        clients.push_back(*it);
+
+        cout << "added client: " << getClientAddress(*it) << endl;
+    }
 }
 
 /**
@@ -63,6 +82,42 @@ void Server::bindSocket() {
 }
 
 /**
+ * Return the client ip as a string representation.
+ *
+ * @since 2017.03.29
+ * @param client
+ * @return ip address as string
+ */
+string Server::getClientAddress(Client client) {
+    char s[INET6_ADDRSTRLEN];
+    string result;
+
+    struct sockaddr_storage clientAddress = client.getAddress();
+    inet_ntop(clientAddress.ss_family, getInAddress((struct sockaddr *) &clientAddress), s, sizeof s);
+    result = s;
+
+    return result;
+}
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
+/**
+ * Get the correct address structure, depending on the ip type.
+ *
+ * @since 2017.03.29
+ * @param address socket address structure
+ * @return ipv4 or ipv6 address structure
+ */
+void *Server::getInAddress(struct sockaddr *address) {
+    if (address->sa_family == AF_INET) {
+        return &(((struct sockaddr_in*) address)->sin_addr);
+    }
+
+    return &(((struct sockaddr_in6*) address)->sin6_addr);
+}
+#pragma clang diagnostic pop
+
+/**
  * Initialize the server connectivity.
  */
 void Server::init() {
@@ -83,6 +138,7 @@ void Server::loop() {
     thread connectionThread(&ConnectionManager::loop, connectionManager);
 
     while (running) {
+        addNewClients();
     }
 
     connectionManager->running = false;

@@ -21,6 +21,23 @@ ConnectionManager::ConnectionManager(int socket) {
 bool ConnectionManager::running;
 
 /**
+ * Returns all new clients.
+ *
+ * Clears the clients vector afterwards.
+ *
+ * @since 2017.03.29
+ * @return a copy of all new clients
+ */
+vector<Client> ConnectionManager::getNewClients() {
+    lock_guard<mutex> guard {clientsMutex};
+    vector<Client> clientsCopy {clients};
+
+    clients.clear();
+
+    return clientsCopy;
+}
+
+/**
  * Main loop to accept connections.
  */
 void ConnectionManager::loop() {
@@ -38,7 +55,9 @@ void ConnectionManager::loop() {
         }
 
         Client client {newAddress, clientSocket};
+        clientsMutex.lock();
         it = clients.end();
         clients.insert(it, client);
+        clientsMutex.unlock();
     }
 }

@@ -7,6 +7,7 @@
 #define MESPLE_SERVER_CONNECTIONMANAGER_HPP
 
 
+#include <mutex>
 #include <vector>
 #include <sys/socket.h>
 
@@ -17,12 +18,14 @@ using namespace std;
 class ConnectionManager {
 private:
     vector<Client> clients;
+    mutex clientsMutex;
     int serverSocket;
 
 public:
     static bool running;
 
     ConnectionManager(int socket);
+    vector<Client> getNewClients();
     void loop();
 };
 

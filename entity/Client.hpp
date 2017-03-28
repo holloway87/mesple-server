@@ -16,6 +16,8 @@ private:
 
 public:
     Client(struct sockaddr_storage address, int clientSocket);
+    struct sockaddr_storage getAddress();
+    int getSocket();
 };
 
 

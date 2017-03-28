@@ -16,13 +16,17 @@ using namespace std;
 
 class Server {
 private:
+    vector<Client> clients;
     ConnectionManager *connectionManager;
     struct addrinfo *serverInfo;
     string serverPort;
     int serverSocket;
     static bool running;
 
+    void addNewClients();
     void bindSocket();
+    string getClientAddress(Client client);
+    void *getInAddress(struct sockaddr *address);
     void setServerInfo();
     void startListen();
 
